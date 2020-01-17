@@ -208,6 +208,12 @@ module OmniAuth
       session['omniauth.params'] = request.GET
       OmniAuth.config.before_request_phase.call(env) if OmniAuth.config.before_request_phase
 
+      if request
+        log :info, "Request.params - #{ request.params.inspect }"
+      else
+        log :info, "Request not available at this point"
+      end
+
       if options.form.respond_to?(:call)
         log :info, 'Rendering form from supplied Rack endpoint.'
         options.form.call(env)
@@ -231,6 +237,9 @@ module OmniAuth
     def callback_call
       setup_phase
       log :info, 'Callback phase initiated.'
+      log :info, "omniauth.params - #{ session['omniauth.params'] }"
+      log :info, "omniauth.origin - #{ session['omniauth.origin'] }"
+
       @env['omniauth.origin'] = session.delete('omniauth.origin')
       @env['omniauth.origin'] = nil if env['omniauth.origin'] == ''
       @env['omniauth.params'] = session.delete('omniauth.params') || {}
